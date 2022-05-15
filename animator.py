@@ -1,4 +1,5 @@
 from os import system, name
+from re import L
 from time import sleep
 from getkey import getkey
 import colorama
@@ -9,9 +10,9 @@ from time import sleep
 import sys
 import string
 
+# <<< leveys 216
 
-
-
+current = 0
 
 string2 = """              
 .___________. _______ .______      .___  ___.  __  .__   __.      ___       __              ___      .__   __.  __  .___  ___.      ___   .___________.  ______   .______         
@@ -89,12 +90,10 @@ def tempo():
     global c
     c = []
     for x in range(7776):
-        lis = ["r","re","w","g","b","c","bl","y"]
-        lis2 = ["<",".","A","c","P","?","f","7","2","9","z","_","#","/"]
-        a = random.choice(lis)
-        b = random.choice(lis)
-        d = random.choice(lis2)
-        c.append([a, b, d])  
+        if x % 2 == 0:
+            c.append(["b", "b", " "]) 
+        else:
+            c.append(["w", "w", " "])    
 
 tempo()
 def e(symbol):
@@ -107,20 +106,18 @@ lstring = list(string2)
 def make():
     global string2,c,lstring
     for x in range(len(lstring)):
-        lstring[x] = f"{e(c[x-1196])}"
+        if lstring[x] == "<":
+            lstring[x] = f"{e(c[x-1196])}"
     string2 = "".join(lstring)       
 make()
 
 
 
 def default():
-    global string2
-    print(string2, Back.RESET)
-    tempo()
-    make()
-    sleep(0.05)
     clear()
-    default()
+    print(Back.RESET + Fore.RESET + string2 + Back.RESET)
+    print(current+1159)
+
 
 
 
@@ -138,26 +135,58 @@ default()
 
 
 
-def gey_getter():
+
+
+while True:
+    xz = 0
     key = getkey()
-    if key == 'i':
+    if key == "i":
         clear()
-        print("""
+        print(Back.RESET + """
         Terminal Animator v.1.0.0 is an animator that runs in bash terminal
         How to use it?
         //FILLLATER//
-        press d to get to the default view
+        press b to get back to the default view
         press q to quit
-        """)
-    if key == "d":
+        """, Back.RESET)
+    if key == "b":
         clear()
         default()   
     if key == "q":
         clear()
-        raise SystemExit(0)     
-    gey_getter()
+        raise SystemExit(0)   
+    wasd = 0      
+    if key == "w":
+        current -= 217
+        wasd += 1
+    if key == "s":
+        current += 217
+        wasd += 1
+    if key == "d":
+        current += 1
+        xz = 1
+        wasd += 1
+    if key == "a":
+        current -= 1
+        wasd += 1
+        xz = 0
+    if current % 217 == 0:
+        if xz == 1:
+            current += 1 
+        else:
+            current -= 1      
+    if current + 1159 > len(lstring) - 6:
+        current = current - 217 * (current // 217)   
+    if current < 0:
+        current += 42 * 217 - 1302
+    if current + 1159 < len(lstring) and current >= 0 and wasd > 0:    
+        prev = lstring[current + 1159]   
+        lstring[current + 1159] = Back.RED + "<"
+        string2 = "".join(lstring)
+        lstring[current + 1159] = prev
+        default()  
+    print(current, len(lstring) - 1159)                       
 
-gey_getter()
 
 
 # colorama examplejeet print(Back.YELLOW + Fore.GREEN + "M" + Back.WHITE + Fore.RED + "O" + Back.BLUE + Fore.YELLOW + "I")
