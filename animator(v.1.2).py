@@ -100,9 +100,13 @@ def tempo():
 
 tempo()
 
+
+c_colors = [["b", "b"], ["bl", "bl"], ["c", "c"], ["g", "g"], ["l", "l"], ["lb", "lb"], ["lc", "lc"], ["lg", "lg"], ["lm", "lm"], ["lr", "lr"], ["lw", "lw"], ["ly", "ly"], ["m", "m"], ["re", "re"], ["w", "w"], ["y", "y"]]
+
+
 # Decoding symbols:
 def e(symbol):
-    dic = {"r":[Back.RESET, Fore.RESET],"re":[Back.RED,Fore.RED],"w":[Back.WHITE, Fore.WHITE],"g":[Back.GREEN,Fore.GREEN],"b":[Back.BLACK, Fore.BLACK],"c":[Back.CYAN,Fore.CYAN],"bl":[Back.BLUE,Fore.BLUE],"y":[Back.YELLOW,Fore.YELLOW]}
+    dic = {"r":[Back.RESET, Fore.RESET],"re":[Back.RED,Fore.RED],"w":[Back.WHITE, Fore.WHITE],"g":[Back.GREEN,Fore.GREEN],"b":[Back.BLACK, Fore.BLACK],"c":[Back.CYAN,Fore.CYAN],"bl":[Back.BLUE,Fore.BLUE],"y":[Back.YELLOW,Fore.YELLOW], "l":[Back.LIGHTBLACK_EX,Fore.LIGHTBLACK_EX],"lb":[Back.LIGHTBLUE_EX,Fore.LIGHTBLUE_EX],"lc":[Back.LIGHTCYAN_EX,Fore.LIGHTCYAN_EX],"lg":[Back.LIGHTGREEN_EX,Fore.LIGHTGREEN_EX],"lm":[Back.LIGHTMAGENTA_EX,Fore.LIGHTMAGENTA_EX],"lr":[Back.LIGHTRED_EX,Fore.LIGHTRED_EX],"lw":[Back.LIGHTWHITE_EX,Fore.LIGHTWHITE_EX],"ly":[Back.LIGHTYELLOW_EX,Fore.LIGHTYELLOW_EX],"m":[Back.MAGENTA,Fore.MAGENTA]}
     back = dic[symbol[0]][0]
     fore = dic[symbol[1]][1]
     return back + fore + symbol[2]                
@@ -122,28 +126,39 @@ make()
 # Printing all stuff:
 def default():
     clear()
-    print(Back.RESET + Fore.RESET + string2 + Back.RESET)
+    print(Back.RESET + Fore.RESET + string2 + Back.RESET + Fore.RESET  + f"\n Cursor color: " + e(c_color + ["<"]) + Back.RESET + Fore.RESET)
     #print(current+1159)
 
-
+c_color = c_colors[14]
 
 
 default()
 
 
 
+# 217 is number of chars in one x level on animator
+
 while True:
-    h, w, prevs, debug, Hpositions, newcur = [], [], [], [], [], []
-    move, xz, wasd, prc = 0, 0, 0, 0
+    # var move tells direction for movement
+    h, prevs, debug, Hpositions, newcur = [], [], [], [], []
+    move, wasd, previous_x = 0, 0, 0
     key = getkey()
     if key == "i":
         clear()
-        print(Back.RESET + """
-        Terminal Animator v.1.0.0 is an animator that runs in bash terminal
+        print(Back.RESET + Fore.RESET + """
+        Terminal Animator v.1.2 is an animator that runs in bash terminal
         How to use it?
         //FILLLATER//
         press b to get back to the default view
         press q to quit
+        
+        Cursor:
+        Move cursor from wasd
+        Cursor areas background is red
+        press m to make cursor larger x level
+        press n to make cursor larger in y level
+        press j to make cursor smaller y level
+        press k to make cursor smaller x level
         """, Back.RESET)
     if key == "b":
         clear()
@@ -159,17 +174,20 @@ while True:
             wasd += 1
     if key == "d":
             move += 1
-            xz = 1
             wasd += 1
     if key == "a":
             move -= 1
             wasd += 1
-            xz = 0
-
+    if key == "c":
+        if c_colors.index(c_color) == len(c_colors) - 1:
+            c_color = c_colors[0]
+        else:
+            c_color = c_colors[c_colors.index(c_color)+1]  
+        wasd += 1    
 
     for x in current:
         h.append(x // 217)
-    debug.append([h,w])  
+    debug.append([h])  
     minH = min(h)   
     width = h.count(max(h,key=h.count))
     h = max(h) - min(h) + 1
@@ -177,9 +195,9 @@ while True:
     # Largening cursor x level
     if key == "m":
         for x in current:
-            if prc != 0:
-                if x != prc + 1 and not (prc + 1) % 217 == 0:
-                    newcur.append(prc + 1)
+            if previous_x != 0:
+                if x != previous_x + 1 and not (previous_x + 1) % 217 == 0:
+                    newcur.append(previous_x + 1)
                     newcur.append(x)
                 else:
                     newcur.append(x)  
@@ -187,7 +205,7 @@ while True:
                 newcur.append(x)     
             if current.index(x) == len(current)-1 and not (x + 1) % 217 == 0:
                 newcur.append(x + 1)         
-            prc = x        
+            previous_x = x        
         current = newcur
         wasd += 1 
     # Largening curor y level
@@ -209,7 +227,7 @@ while True:
         if width > 1:
             del current[width-1::width]
             wasd += 1
-    debug.append([h,w, "Haloe"]) 
+    debug.append([h, "Haloe"]) 
 
     for x in range(len(current)):
         if current[x] // 217 - minH not in Hpositions:
@@ -226,7 +244,7 @@ while True:
     # Displaying movement:  
     for x in current:      
         prevs.append([lstring[x + 1159], x + 1159])        
-        lstring[x + 1159] = Back.RED + "<"
+        lstring[x + 1159] = e(c_color + ["<"])
     string2 = "".join(lstring)  
     for x in prevs:
         lstring[x[1]] = x[0]   
